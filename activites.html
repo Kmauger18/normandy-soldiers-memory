@@ -31,7 +31,7 @@
   <div class="wrap reveal">
     <span class="eyebrow">Activités</span>
     <h1>Faire revivre 1944</h1>
-    <p>Nous créons nos propres événements et participons à ceux de nos partenaires, partout en Normandie.</p>
+    <p data-cms="act_intro">Nous créons nos propres événements et participons à ceux de nos partenaires, partout en Normandie.</p>
     <div class="crumbs"><a href="index.html">Accueil</a> &nbsp;/&nbsp; Activités</div>
   </div>
 </section><section>
@@ -39,7 +39,7 @@
     <div class="reveal">
       <span class="eyebrow">Militaire</span>
       <h2>Camps de reconstitution</h2>
-      <p class="lead">Nous installons des camps militaires tels qu'il en existait en Normandie en 1944 : tentes, matériel, véhicules d'époque. Nos membres en uniforme répondent aux questions des visiteurs. Ces camps sont ouverts gratuitement au public.</p>
+      <p class="lead" data-cms="act_camps_texte">Nous installons des camps militaires tels qu'il en existait en Normandie en 1944 : tentes, matériel, véhicules d'époque. Nos membres en uniforme répondent aux questions des visiteurs. Ces camps sont ouverts gratuitement au public.</p>
       <div class="card-body" style="padding:0"><ul><li>Poste de commandement</li><li>Hôpital de campagne</li><li>Cantine et vie de camp</li><li>Véhicules d’époque (jeeps, camions)</li></ul></div>
     </div>
     <div class="reveal"><figure class="frame tilt-r"><div class="ph-wide"><img src="photos/jeep-camp.jpg" alt="Camp Normandy Soldiers Memory" loading="lazy" style="width:100%;height:100%;object-fit:cover"></div><figcaption>Camp Normandy Soldiers Memory</figcaption></figure></div>
@@ -48,7 +48,7 @@
     <div class="reveal">
       <span class="eyebrow">Civil</span>
       <h2>Reconstitutions civiles</h2>
-      <p class="lead">La guerre ne s'est pas vécue qu'au front. Nous faisons revivre le quotidien des Normands sous l'Occupation et à la Libération : le café du village, les tenues, les objets du quotidien.</p>
+      <p class="lead" data-cms="act_civil_texte">La guerre ne s'est pas vécue qu'au front. Nous faisons revivre le quotidien des Normands sous l'Occupation et à la Libération : le café du village, les tenues, les objets du quotidien.</p>
       <div class="card-body" style="padding:0"><ul><li>Scènes de vie quotidienne</li><li>Tenues et objets d’époque</li><li>Hommage aux victimes civiles</li></ul></div>
     </div>
     <div class="reveal"><figure class="frame tilt-l"><div class="ph-wide"><img src="photos/bistrot-patron.jpg" alt="Le café du village, 1944" loading="lazy" style="width:100%;height:100%;object-fit:cover"></div><figcaption>Le café du village, 1944</figcaption></figure></div>
@@ -57,7 +57,7 @@
     <div class="reveal">
       <span class="eyebrow">Mémoire</span>
       <h2>Commémorations & hommages</h2>
-      <p class="lead">Nous participons aux cérémonies du souvenir aux côtés des autorités, des anciens combattants et des délégations alliées : dépôts de gerbes, marches du souvenir, haies d'honneur.</p>
+      <p class="lead" data-cms="act_memoire_texte">Nous participons aux cérémonies du souvenir aux côtés des autorités, des anciens combattants et des délégations alliées : dépôts de gerbes, marches du souvenir, haies d'honneur.</p>
       <div class="card-body" style="padding:0"><ul><li>Cérémonies du Débarquement</li><li>Hommages aux régiments alliés</li><li>Rencontres avec les délégations</li></ul></div>
     </div>
     <div class="reveal"><figure class="frame tilt-r"><div class="ph-wide"><img src="photos/drapeaux.jpg" alt="Porte-drapeaux lors d’une cérémonie" loading="lazy" style="width:100%;height:100%;object-fit:cover"></div><figcaption>Porte-drapeaux lors d’une cérémonie</figcaption></figure></div>
@@ -66,7 +66,7 @@
     <div class="reveal">
       <span class="eyebrow">Partenaires</span>
       <h2>Animations sur mesure</h2>
-      <p class="lead">Mairies, musées, écoles, comités des fêtes : nous intervenons pour animer une commémoration, une exposition ou une journée historique, seuls ou avec d'autres associations.</p>
+      <p class="lead" data-cms="act_partenaires_texte">Mairies, musées, écoles, comités des fêtes : nous intervenons pour animer une commémoration, une exposition ou une journée historique, seuls ou avec d'autres associations.</p>
       <div class="card-body" style="padding:0"><ul><li>Journées historiques</li><li>Expositions et salons</li><li>Interventions pédagogiques</li></ul></div>
     </div>
     <div class="reveal"><figure class="frame tilt-l"><div class="ph-wide"><img src="photos/royal-marines.jpg" alt="Rencontre avec les Royal Marines" loading="lazy" style="width:100%;height:100%;object-fit:cover"></div><figcaption>Rencontre avec les Royal Marines</figcaption></figure></div>
@@ -118,17 +118,21 @@
   /* ---- galerie ---- */
   function initGallery(root){
     var g=root.querySelector('#gallery'); if(!g||g.dataset.ok) return; g.dataset.ok=1;
-    var shots=[].slice.call(g.querySelectorAll('.shot')), lb=root.querySelector('#lb'), li=root.querySelector('#lb-img'), lc=root.querySelector('#lb-cap'), cur=0;
+    var lb=root.querySelector('#lb'), li=root.querySelector('#lb-img'), lc=root.querySelector('#lb-cap'), cur=0, jeton=0;
+    function shots(){ return [].slice.call(g.querySelectorAll('.shot')); }
+    function filtrer(f){ shots().forEach(function(s){ s.classList.toggle('hide', f!=='all' && s.dataset.c!==f); s.classList.add('in'); }); }
     root.querySelectorAll('.filters button').forEach(function(b){ b.addEventListener('click', function(){
-      root.querySelectorAll('.filters button').forEach(function(x){x.classList.remove('on');}); b.classList.add('on');
-      var f=b.dataset.f; shots.forEach(function(s){ s.classList.toggle('hide', f!=='all' && s.dataset.c!==f); s.classList.add('in'); });
+      root.querySelectorAll('.filters button').forEach(function(x){x.classList.remove('on');}); b.classList.add('on'); filtrer(b.dataset.f);
     });});
-    function visible(){ return shots.filter(function(s){ return !s.classList.contains('hide'); }); }
-    function show(s){ var v=visible(); cur=v.indexOf(s); var im=s.querySelector('img'); li.src=im.src; li.alt=im.alt;
-      lc.innerHTML=im.alt+'<small>'+s.querySelector('figcaption span').textContent+'</small>'; lb.classList.add('open'); lb.setAttribute('aria-hidden','false'); }
+    g.refiltrer=function(){ var b=root.querySelector('.filters button.on'); filtrer(b?b.dataset.f:'all'); };
+    function visible(){ return shots().filter(function(s){ return !s.classList.contains('hide'); }); }
+    function show(s){ var v=visible(); cur=v.indexOf(s); var im=s.querySelector('img'), t=++jeton; li.src=im.src; li.alt=im.alt;
+      if(im.dataset.hd && window.NSM_hd){ window.NSM_hd(im.dataset.hd).then(function(u){ if(u && t===jeton) li.src=u; }).catch(function(){}); }
+      lc.innerHTML=''; lc.appendChild(document.createTextNode(im.alt)); var sm=document.createElement('small'); sm.textContent=s.querySelector('figcaption span').textContent; lc.appendChild(sm);
+      lb.classList.add('open'); lb.setAttribute('aria-hidden','false'); }
     function step(d){ var v=visible(); if(!v.length) return; show(v[(cur+d+v.length)%v.length]); }
-    function close(){ lb.classList.remove('open'); lb.setAttribute('aria-hidden','true'); }
-    shots.forEach(function(s){ s.addEventListener('click', function(){ show(s); }); });
+    function close(){ lb.classList.remove('open'); lb.setAttribute('aria-hidden','true'); jeton++; }
+    g.addEventListener('click', function(e){ var s=e.target.closest('.shot'); if(s) show(s); });
     lb.querySelector('.lb-close').addEventListener('click', close);
     lb.querySelector('.lb-prev').addEventListener('click', function(e){ e.stopPropagation(); step(-1); });
     lb.querySelector('.lb-next').addEventListener('click', function(e){ e.stopPropagation(); step(1); });
@@ -136,6 +140,7 @@
     document.addEventListener('keydown', function(e){ if(!lb.classList.contains('open')) return;
       if(e.key==='Escape') close(); if(e.key==='ArrowRight') step(1); if(e.key==='ArrowLeft') step(-1); });
   }
+  window.NSM = { reveal: reveal, initGallery: initGallery };
 
   if(SINGLE){
     var TITLES={"index": "Accueil", "association": "L'association", "activites": "Nos activités", "historique": "Historique", "archives": "Archives du Front", "agenda": "Agenda", "rejoindre": "Nous rejoindre", "contact": "Contact"};
@@ -152,5 +157,6 @@
   } else { onScroll(); reveal(); initGallery(document); }
 })();
 </script>
+<script type="module" src="js/cms.js"></script>
 </body>
 </html>

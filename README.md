@@ -17,9 +17,17 @@ Site statique : HTML et CSS, sans framework ni étape de compilation.
 | `rejoindre.html` | Nous rejoindre |
 | `contact.html` | Contact |
 
+## Contenu géré depuis l'espace de gestion
+
+Les textes, l'agenda, l'historique, la FAQ, la galerie « Archives du Front », les coordonnées et le bandeau d'annonce se modifient depuis l'[espace de gestion](https://github.com/Kmauger18/normandy-soldiers-memory-Gestion) (Firebase). Le script `js/cms.js` charge ce contenu au moment où la page s'ouvre.
+
+Tant que la base Firebase est vide, le site affiche le contenu écrit dans ses pages : il reste donc complet même sans Firebase.
+
 ## Structure
 
 - `style.css` : feuille de style commune
+- `firebase-config.js` : configuration Firebase (la même que dans le dépôt de gestion)
+- `js/cms.js` : chargement du contenu géré
 - `photos/` : photos de la galerie et des pages (en remplaçant un fichier par une version en meilleure qualité, il faut garder le même nom)
 - `favicon.svg`, `favicon.ico`, `apple-touch-icon.png`, `icons/`, `site.webmanifest` : logo de l'onglet et icônes
 

@@ -299,6 +299,15 @@
   .faq details[open] summary::after{content:"–"}
   .faq p{margin-top:12px;color:var(--muted)}
   .page[hidden]{display:none!important}
+  /* bandeau d'annonce (géré depuis l'espace de gestion) */
+  .annonce{position:fixed;top:0;left:0;right:0;z-index:60;background:var(--red);color:#fff;text-align:center;font-size:.86rem;padding:9px 48px;line-height:1.35}
+  .annonce a{color:#fff;font-weight:600;margin-left:8px}
+  .annonce button{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:0;color:#fff;font-size:1.1rem;cursor:pointer;opacity:.8}
+  body.avec-annonce header.nav{top:var(--h-annonce,38px)}
+  body.avec-annonce nav ul{top:calc(78px + var(--h-annonce,38px))}
+  .event p.e-desc{margin-top:6px;color:rgba(236,228,209,.8)}
+  .e-status.annule{border-color:#c0574d;color:#f0a49b}
+  .e-status.complet{border-color:var(--brass);color:var(--brass)}
   @media (max-width:980px){
     .split,.split.rev{grid-template-columns:1fr;gap:44px}
     .split.rev > :first-child{order:0}

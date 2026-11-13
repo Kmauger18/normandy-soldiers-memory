@@ -31,7 +31,7 @@
   <div class="wrap reveal">
     <span class="eyebrow">Contact</span>
     <h1>Prendre contact</h1>
-    <p>Une question, une demande d'intervention ou l'envie de nous rejoindre ? Nous vous répondrons avec plaisir.</p>
+    <p data-cms="contact_intro">Une question, une demande d'intervention ou l'envie de nous rejoindre ? Nous vous répondrons avec plaisir.</p>
     <div class="crumbs"><a href="index.html">Accueil</a> &nbsp;/&nbsp; Contact</div>
   </div>
 </section>
@@ -41,8 +41,9 @@
       <span class="eyebrow">Coordonnées</span>
       <h2>Nous joindre</h2>
       <div class="contact-list">
-        <div class="c-row"><span>Adresse</span><p>7 rue Jean Cocteau<br>14123 Ifs — Calvados</p></div>
-        <div class="c-row"><span>Téléphone</span><a href="tel:+33669543362">06 69 54 33 62</a></div>
+        <div class="c-row"><span>Adresse</span><p data-coord="adresse">7 rue Jean Cocteau<br>14123 Ifs — Calvados</p></div>
+        <div class="c-row"><span>Téléphone</span><a href="tel:+33669543362" data-coord="telephone">06 69 54 33 62</a></div>
+        <div class="c-row" data-coord-row="email" hidden><span>E-mail</span><a href="#" data-coord="email"></a></div>
         <div class="c-row"><span>Facebook</span><a href="https://www.facebook.com/NormandySoldiersMemory/" target="_blank" rel="noopener">@NormandySoldiersMemory</a></div>
         <div class="c-row"><span>Dons</span><a href="https://www.helloasso.com/associations/normandy-soldiers-memory" target="_blank" rel="noopener">HelloAsso — Normandy Soldiers Memory</a></div>
       </div>
@@ -98,17 +99,21 @@
   /* ---- galerie ---- */
   function initGallery(root){
     var g=root.querySelector('#gallery'); if(!g||g.dataset.ok) return; g.dataset.ok=1;
-    var shots=[].slice.call(g.querySelectorAll('.shot')), lb=root.querySelector('#lb'), li=root.querySelector('#lb-img'), lc=root.querySelector('#lb-cap'), cur=0;
+    var lb=root.querySelector('#lb'), li=root.querySelector('#lb-img'), lc=root.querySelector('#lb-cap'), cur=0, jeton=0;
+    function shots(){ return [].slice.call(g.querySelectorAll('.shot')); }
+    function filtrer(f){ shots().forEach(function(s){ s.classList.toggle('hide', f!=='all' && s.dataset.c!==f); s.classList.add('in'); }); }
     root.querySelectorAll('.filters button').forEach(function(b){ b.addEventListener('click', function(){
-      root.querySelectorAll('.filters button').forEach(function(x){x.classList.remove('on');}); b.classList.add('on');
-      var f=b.dataset.f; shots.forEach(function(s){ s.classList.toggle('hide', f!=='all' && s.dataset.c!==f); s.classList.add('in'); });
+      root.querySelectorAll('.filters button').forEach(function(x){x.classList.remove('on');}); b.classList.add('on'); filtrer(b.dataset.f);
     });});
-    function visible(){ return shots.filter(function(s){ return !s.classList.contains('hide'); }); }
-    function show(s){ var v=visible(); cur=v.indexOf(s); var im=s.querySelector('img'); li.src=im.src; li.alt=im.alt;
-      lc.innerHTML=im.alt+'<small>'+s.querySelector('figcaption span').textContent+'</small>'; lb.classList.add('open'); lb.setAttribute('aria-hidden','false'); }
+    g.refiltrer=function(){ var b=root.querySelector('.filters button.on'); filtrer(b?b.dataset.f:'all'); };
+    function visible(){ return shots().filter(function(s){ return !s.classList.contains('hide'); }); }
+    function show(s){ var v=visible(); cur=v.indexOf(s); var im=s.querySelector('img'), t=++jeton; li.src=im.src; li.alt=im.alt;
+      if(im.dataset.hd && window.NSM_hd){ window.NSM_hd(im.dataset.hd).then(function(u){ if(u && t===jeton) li.src=u; }).catch(function(){}); }
+      lc.innerHTML=''; lc.appendChild(document.createTextNode(im.alt)); var sm=document.createElement('small'); sm.textContent=s.querySelector('figcaption span').textContent; lc.appendChild(sm);
+      lb.classList.add('open'); lb.setAttribute('aria-hidden','false'); }
     function step(d){ var v=visible(); if(!v.length) return; show(v[(cur+d+v.length)%v.length]); }
-    function close(){ lb.classList.remove('open'); lb.setAttribute('aria-hidden','true'); }
-    shots.forEach(function(s){ s.addEventListener('click', function(){ show(s); }); });
+    function close(){ lb.classList.remove('open'); lb.setAttribute('aria-hidden','true'); jeton++; }
+    g.addEventListener('click', function(e){ var s=e.target.closest('.shot'); if(s) show(s); });
     lb.querySelector('.lb-close').addEventListener('click', close);
     lb.querySelector('.lb-prev').addEventListener('click', function(e){ e.stopPropagation(); step(-1); });
     lb.querySelector('.lb-next').addEventListener('click', function(e){ e.stopPropagation(); step(1); });
@@ -116,6 +121,7 @@
     document.addEventListener('keydown', function(e){ if(!lb.classList.contains('open')) return;
       if(e.key==='Escape') close(); if(e.key==='ArrowRight') step(1); if(e.key==='ArrowLeft') step(-1); });
   }
+  window.NSM = { reveal: reveal, initGallery: initGallery };
 
   if(SINGLE){
     var TITLES={"index": "Accueil", "association": "L'association", "activites": "Nos activités", "historique": "Historique", "archives": "Archives du Front", "agenda": "Agenda", "rejoindre": "Nous rejoindre", "contact": "Contact"};
@@ -132,5 +138,6 @@
   } else { onScroll(); reveal(); initGallery(document); }
 })();
 </script>
+<script type="module" src="js/cms.js"></script>
 </body>
 </html>

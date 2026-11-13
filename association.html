@@ -31,7 +31,7 @@
   <div class="wrap reveal">
     <span class="eyebrow">L'association</span>
     <h1>Qui sommes-nous</h1>
-    <p>Une association de bénévoles passionnés, née à Ifs, aux portes de Caen, pour perpétuer le devoir de mémoire.</p>
+    <p data-cms="asso_intro">Une association de bénévoles passionnés, née à Ifs, aux portes de Caen, pour perpétuer le devoir de mémoire.</p>
     <div class="crumbs"><a href="index.html">Accueil</a> &nbsp;/&nbsp; L'association</div>
   </div>
 </section>
@@ -39,9 +39,9 @@
   <div class="wrap split">
     <div class="reveal">
       <span class="eyebrow">Notre histoire</span>
-      <h2>Faire vivre l'histoire, pas la guerre</h2>
-      <p class="lead">Créée en février 2020, Normandy Soldiers Memory réunit des passionnés de la période 1939-1945. En uniformes et tenues civiles d'époque, avec du matériel authentique ou fidèlement reproduit, nous recréons la vie des soldats alliés et des civils pendant la bataille de Normandie.</p>
-      <p class="quote">Reconstituer, ce n'est pas glorifier la guerre : c'est rendre visible ce qu'ont vécu ceux qui l'ont traversée, pour que les générations futures s'en souviennent.</p>
+      <h2 data-cms="asso_histoire_titre">Faire vivre l'histoire, pas la guerre</h2>
+      <p class="lead" data-cms="asso_histoire_texte">Créée en février 2020, Normandy Soldiers Memory réunit des passionnés de la période 1939-1945. En uniformes et tenues civiles d'époque, avec du matériel authentique ou fidèlement reproduit, nous recréons la vie des soldats alliés et des civils pendant la bataille de Normandie.</p>
+      <p class="quote" data-cms="asso_citation">Reconstituer, ce n'est pas glorifier la guerre : c'est rendre visible ce qu'ont vécu ceux qui l'ont traversée, pour que les générations futures s'en souviennent.</p>
     </div>
     <div class="reveal"><figure class="frame tilt-r"><div class="ph-wide"><img src="photos/jeep-plage.jpg" alt="Tenues civiles et RAF, face à la Manche" loading="lazy" style="width:100%;height:100%;object-fit:cover"></div><figcaption>Tenues civiles et RAF, face à la Manche</figcaption></figure></div>
   </div>
@@ -74,8 +74,8 @@
   <div class="wrap split rev">
     <div class="reveal">
       <span class="eyebrow">Nos valeurs</span>
-      <h2>Respect, rigueur, transmission</h2>
-      <p class="lead">Nous attachons une grande importance à l'exactitude historique des tenues et du matériel, au respect dû aux anciens combattants et aux familles, et à un esprit résolument pacifique. Chaque sortie est l'occasion d'échanger avec le public et de partager ce que nous avons appris.</p>
+      <h2 data-cms="asso_valeurs_titre">Respect, rigueur, transmission</h2>
+      <p class="lead" data-cms="asso_valeurs_texte">Nous attachons une grande importance à l'exactitude historique des tenues et du matériel, au respect dû aux anciens combattants et aux familles, et à un esprit résolument pacifique. Chaque sortie est l'occasion d'échanger avec le public et de partager ce que nous avons appris.</p>
       <div class="hero-ctas"><a href="activites.html" class="btn btn-dark">Voir nos activités</a></div>
     </div>
     <div class="reveal"><figure class="frame tilt-l"><div class="ph-tall"><img src="photos/cornemuse.jpg" alt="Marche du souvenir" loading="lazy" style="width:100%;height:100%;object-fit:cover"></div><figcaption>Marche du souvenir</figcaption></figure></div>
@@ -129,17 +129,21 @@
   /* ---- galerie ---- */
   function initGallery(root){
     var g=root.querySelector('#gallery'); if(!g||g.dataset.ok) return; g.dataset.ok=1;
-    var shots=[].slice.call(g.querySelectorAll('.shot')), lb=root.querySelector('#lb'), li=root.querySelector('#lb-img'), lc=root.querySelector('#lb-cap'), cur=0;
+    var lb=root.querySelector('#lb'), li=root.querySelector('#lb-img'), lc=root.querySelector('#lb-cap'), cur=0, jeton=0;
+    function shots(){ return [].slice.call(g.querySelectorAll('.shot')); }
+    function filtrer(f){ shots().forEach(function(s){ s.classList.toggle('hide', f!=='all' && s.dataset.c!==f); s.classList.add('in'); }); }
     root.querySelectorAll('.filters button').forEach(function(b){ b.addEventListener('click', function(){
-      root.querySelectorAll('.filters button').forEach(function(x){x.classList.remove('on');}); b.classList.add('on');
-      var f=b.dataset.f; shots.forEach(function(s){ s.classList.toggle('hide', f!=='all' && s.dataset.c!==f); s.classList.add('in'); });
+      root.querySelectorAll('.filters button').forEach(function(x){x.classList.remove('on');}); b.classList.add('on'); filtrer(b.dataset.f);
     });});
-    function visible(){ return shots.filter(function(s){ return !s.classList.contains('hide'); }); }
-    function show(s){ var v=visible(); cur=v.indexOf(s); var im=s.querySelector('img'); li.src=im.src; li.alt=im.alt;
-      lc.innerHTML=im.alt+'<small>'+s.querySelector('figcaption span').textContent+'</small>'; lb.classList.add('open'); lb.setAttribute('aria-hidden','false'); }
+    g.refiltrer=function(){ var b=root.querySelector('.filters button.on'); filtrer(b?b.dataset.f:'all'); };
+    function visible(){ return shots().filter(function(s){ return !s.classList.contains('hide'); }); }
+    function show(s){ var v=visible(); cur=v.indexOf(s); var im=s.querySelector('img'), t=++jeton; li.src=im.src; li.alt=im.alt;
+      if(im.dataset.hd && window.NSM_hd){ window.NSM_hd(im.dataset.hd).then(function(u){ if(u && t===jeton) li.src=u; }).catch(function(){}); }
+      lc.innerHTML=''; lc.appendChild(document.createTextNode(im.alt)); var sm=document.createElement('small'); sm.textContent=s.querySelector('figcaption span').textContent; lc.appendChild(sm);
+      lb.classList.add('open'); lb.setAttribute('aria-hidden','false'); }
     function step(d){ var v=visible(); if(!v.length) return; show(v[(cur+d+v.length)%v.length]); }
-    function close(){ lb.classList.remove('open'); lb.setAttribute('aria-hidden','true'); }
-    shots.forEach(function(s){ s.addEventListener('click', function(){ show(s); }); });
+    function close(){ lb.classList.remove('open'); lb.setAttribute('aria-hidden','true'); jeton++; }
+    g.addEventListener('click', function(e){ var s=e.target.closest('.shot'); if(s) show(s); });
     lb.querySelector('.lb-close').addEventListener('click', close);
     lb.querySelector('.lb-prev').addEventListener('click', function(e){ e.stopPropagation(); step(-1); });
     lb.querySelector('.lb-next').addEventListener('click', function(e){ e.stopPropagation(); step(1); });
@@ -147,6 +151,7 @@
     document.addEventListener('keydown', function(e){ if(!lb.classList.contains('open')) return;
       if(e.key==='Escape') close(); if(e.key==='ArrowRight') step(1); if(e.key==='ArrowLeft') step(-1); });
   }
+  window.NSM = { reveal: reveal, initGallery: initGallery };
 
   if(SINGLE){
     var TITLES={"index": "Accueil", "association": "L'association", "activites": "Nos activités", "historique": "Historique", "archives": "Archives du Front", "agenda": "Agenda", "rejoindre": "Nous rejoindre", "contact": "Contact"};
@@ -163,5 +168,6 @@
   } else { onScroll(); reveal(); initGallery(document); }
 })();
 </script>
+<script type="module" src="js/cms.js"></script>
 </body>
 </html>
